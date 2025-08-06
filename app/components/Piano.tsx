@@ -4,11 +4,12 @@ import React, { useCallback } from "react"
 import { useWindChime } from "../hooks/useWindChime"
 import { useRecording } from "../hooks/useRecording"
 import { Controls } from "./Controls"
-import { Keyboard } from "./Keyboard"
+import { MelodyCanvas } from "./MelodyCanvas"
 import { RecordedNotes } from "./RecordedNotes"
 
 const Piano: React.FC = () => {
-  const { playNote: playWindChimeNote, synthRef } = useWindChime()
+  const [noteDuration, setNoteDuration] = React.useState("2n")
+  const { playNote: playWindChimeNote, synthRef } = useWindChime(noteDuration)
   const {
     isRecording,
     recordedNotes,
@@ -28,6 +29,18 @@ const Piano: React.FC = () => {
     [playWindChimeNote, addNote]
   )
 
+  const handleStartDrawing = useCallback(() => {
+    if (!isRecording) {
+      startRecording()
+    }
+  }, [isRecording, startRecording])
+
+  const handleEndDrawing = useCallback(() => {
+    if (isRecording) {
+      stopRecording()
+    }
+  }, [isRecording, stopRecording])
+
   return (
     <div className="piano-container">
       <h1>風鈴メロディメーカー</h1>
@@ -40,9 +53,16 @@ const Piano: React.FC = () => {
         onStopRecording={stopRecording}
         onPlayRecording={playRecording}
         onClearRecording={clearRecording}
+        noteDuration={noteDuration}
+        onDurationChange={setNoteDuration}
       />
 
-      <Keyboard onPlayNote={handlePlayNote} />
+      <MelodyCanvas 
+        onPlayNote={handlePlayNote} 
+        isRecording={isRecording}
+        onStartDrawing={handleStartDrawing}
+        onEndDrawing={handleEndDrawing}
+      />
 
       <RecordedNotes notes={recordedNotes} />
 
@@ -51,7 +71,7 @@ const Piano: React.FC = () => {
           display: flex;
           flex-direction: column;
           align-items: center;
-          padding: 20px;
+          padding: 0;
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           min-height: 100vh;
           font-family: Arial, sans-serif;

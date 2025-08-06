@@ -2,7 +2,7 @@ import { useRef, useEffect, useCallback } from "react"
 import * as Tone from "tone"
 import { WIND_CHIME_CONFIG } from "../constants/audio"
 
-export const useWindChime = () => {
+export const useWindChime = (duration: string = WIND_CHIME_CONFIG.NOTE_DURATION) => {
   const synthRef = useRef<Tone.PolySynth | null>(null)
   const reverbRef = useRef<Tone.Reverb | null>(null)
 
@@ -35,8 +35,8 @@ export const useWindChime = () => {
     if (!synthRef.current) return
 
     await Tone.start()
-    synthRef.current.triggerAttackRelease(note, WIND_CHIME_CONFIG.NOTE_DURATION)
-  }, [])
+    synthRef.current.triggerAttackRelease(note, duration)
+  }, [duration])
 
   return { playNote, synthRef }
 }

@@ -31,7 +31,15 @@ export const useRecording = ({ synthRef }: UseRecordingProps) => {
     if (!isRecording) return
 
     const currentTime = Date.now() - recordingStartTime.current
-    setRecordedNotes(prev => [...prev, { note, time: currentTime }])
+    
+    // Throttle note addition to prevent too many duplicate notes
+    setRecordedNotes(prev => {
+      const lastNote = prev[prev.length - 1]
+      if (lastNote && lastNote.note === note && (currentTime - lastNote.time) < 100) {
+        return prev // Skip if same note within 100ms
+      }
+      return [...prev, { note, time: currentTime }]
+    })
   }, [isRecording])
 
   const playRecording = useCallback(async () => {

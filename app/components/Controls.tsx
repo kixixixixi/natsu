@@ -8,7 +8,16 @@ interface ControlsProps {
   onStopRecording: () => void
   onPlayRecording: () => void
   onClearRecording: () => void
+  noteDuration: string
+  onDurationChange: (duration: string) => void
 }
+
+const DURATION_OPTIONS = [
+  { value: "8n", label: "短い" },
+  { value: "4n", label: "普通" },
+  { value: "2n", label: "長い" },
+  { value: "1n", label: "とても長い" },
+] as const
 
 export const Controls: React.FC<ControlsProps> = ({
   isRecording,
@@ -18,6 +27,8 @@ export const Controls: React.FC<ControlsProps> = ({
   onStopRecording,
   onPlayRecording,
   onClearRecording,
+  noteDuration,
+  onDurationChange,
 }) => {
   return (
     <div className="controls">
@@ -25,7 +36,7 @@ export const Controls: React.FC<ControlsProps> = ({
         onClick={isRecording ? onStopRecording : onStartRecording}
         className={`record-btn ${isRecording ? "recording" : ""}`}
       >
-        {isRecording ? "🔴 録音停止" : "⚪ 録音開始"}
+        {isRecording ? "🔴 録音中（自動）" : "⚪ 手動録音"}
       </button>
 
       <button
@@ -43,6 +54,21 @@ export const Controls: React.FC<ControlsProps> = ({
       >
         🗑️ クリア
       </button>
+
+      <div className="duration-control">
+        <label htmlFor="duration-select">音の持続:</label>
+        <select
+          id="duration-select"
+          value={noteDuration}
+          onChange={(e) => onDurationChange(e.target.value)}
+        >
+          {DURATION_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <style>{`
         .controls {
@@ -99,6 +125,34 @@ export const Controls: React.FC<ControlsProps> = ({
         .controls button:hover:not(:disabled) {
           transform: translateY(-2px);
           box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .duration-control {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .duration-control label {
+          color: white;
+          font-size: 14px;
+          font-weight: 500;
+        }
+
+        .duration-control select {
+          padding: 8px 12px;
+          border: none;
+          border-radius: 6px;
+          background: rgba(255, 255, 255, 0.9);
+          font-size: 14px;
+          cursor: pointer;
+          outline: none;
+          transition: all 0.2s ease;
+        }
+
+        .duration-control select:focus {
+          box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
         }
       `}</style>
     </div>
